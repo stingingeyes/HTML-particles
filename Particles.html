@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+	<head>
+
+		<meta charset="iso-8859-1">
+		<title>Canvas Particles</title>
+		<meta name="description" content="Canvas particle experiment.">
+
+		<style type="text/css">
+			html * {margin:0; padding:0;}
+			canvas#canvas {background:#fff;}
+		</style>
+
+
+<script type="text/javascript">
+
+/*
+	Particles canvas experiment
+	(c) Martin Latter, 13 March 2012
+	License: GNU Affero GPL v3.0
+	A very simple derivation of an 'exploding particle' system I created in Processing in 2009.
+*/
+
+
+var 
+	iWidth = 600,
+	iHeight = 600,
+	iNumParticles = 100,
+	aColor = ["#10222B", "#6C9CE1", "#9A9A9A", "#F0F8FF", "#9CACDC"],
+	aParticleHolder = [],
+	oContext = {};
+
+
+var Particle = function() {
+
+	this.x = Math.random() * iWidth;
+	this.y = Math.random() * iHeight;
+	this.velocity = (Math.random() * 10) + 0.2;
+	this.size = (Math.random() * 10) + 4;
+	this.color = aColor[Math.floor(Math.random() * this.iNumCols)];
+	this.direction = Math.random() * Math.PI * 2;
+};
+
+
+Particle.prototype.iNumCols = aColor.length;
+
+
+Particle.prototype.move = function() {
+
+	this.x += this.velocity * Math.cos(this.direction);
+	this.y += this.velocity * Math.sin(this.direction);
+
+	if (this.x > iWidth) {this.x = 1;}
+	if (this.y > iHeight) {this.y = 1;}
+	if (this.x < 1) {this.x = iWidth;}
+	if (this.y < 1) {this.y = iHeight;}
+
+	oContext.beginPath();
+	oContext.fillStyle = this.color;
+	oContext.arc(this.x, this.y, this.size, 0, Math.PI * 2, true); 
+	oContext.closePath();
+	oContext.fill();
+};
+
+
+function createParticles() {
+
+	var i = 0;
+	for (; i < iNumParticles; i++) {
+		aParticleHolder[i] = new Particle();
+	}
+}
+
+
+function init() {
+
+	var 
+		bCanvasEnabled = false,
+		oCanvas = document.getElementById("canvas"),
+		iInterval = 1000 / 50;
+
+	createParticles();
+
+	if (oCanvas.getContext) {
+		oContext = oCanvas.getContext("2d");
+		bCanvasEnabled = true;
+	}
+
+	if (bCanvasEnabled) {
+		window.setInterval(drawloop, iInterval);
+	}
+	else {
+		document.getElementById("canvaserror").innerHTML = "Canvas is disabled.";
+	}
+}
+
+
+function drawloop() {
+
+	var i = 0;
+
+	oContext.clearRect(0, 0, iWidth, iHeight);
+
+	for (; i < iNumParticles; i++) {
+		aParticleHolder[i].move();
+	}
+}
+
+
+window.onload = init;
+
+
+window.onunload = function() {
+	aParticleHolder = null;
+};
+
+</script>
+
+	</head>
+
+	<body>
+
+		<div id="canvaserror"></div>
+
+		<canvas id="canvas" width="600" height="600">
+			This browser does not support canvas.
+		</canvas>
+
+	</body>
+
+</html>
